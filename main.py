@@ -1,4 +1,4 @@
-from core.renderer import EuclidianRenderer
+from core.renderer import EuclidianRenderer, OldEuclidianRenderer
 from core.scene import Scene
 
 from core.euclidianShapes import Cube
@@ -18,11 +18,13 @@ sc = Scene()
 
 cam = FlyCamera()
 sc.addObject(cam)
-renderer = EuclidianRenderer('EUCLID',cam)
+renderer = OldEuclidianRenderer('EUCLID',cam)
 sc.addObject(renderer)
 
 cu = Cube((5,0,0))
 sc.addObject(cu,["EUCLID"])
+cu2 = Cube((0,2,0))
+sc.addObject(cu2,["EUCLID"])
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(sc.load(screen))

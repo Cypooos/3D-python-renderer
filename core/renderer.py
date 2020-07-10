@@ -4,13 +4,13 @@ import pygame
 
 from core.positions import EuclidianPosition
 
-class EuclidianRenderer():
+class OldEuclidianRenderer():
 
   def __init__(self,tagToRender,camera):
     self.scene = None
     self.tagToRender = tagToRender
     self.parent = camera
-    self.position = EuclidianPosition([0,0,0],[0,0])
+    self.transform = EuclidianPosition([0,0,0],[0,0])
 
   @staticmethod # nerd shit
   def rotate2d(pos,rad): x,y = pos;  s,c = math.sin(rad),math.cos(rad); return x*c-y*s,y*c+x*s
@@ -18,9 +18,9 @@ class EuclidianRenderer():
   def _calculatePoints(self,obj):
     # cam.fov cam.rot cam.pos cam
     for x,y,z in obj.verts:
-      position = self.scene.getAbsolutePos(self)
-      x -= position.pos[0];y -=position.pos[1];z -=position.pos[2]
-      x,z = self.rotate2d((x,z),position.rot[1]);y,z = self.rotate2d((y,z),position.rot[0])
+      transform = self.scene.getAbsolutePos(self)
+      x -= transform.pos[0];y -=transform.pos[1];z -=transform.pos[2]
+      x,z = self.rotate2d((x,z),transform.rot[1]);y,z = self.rotate2d((y,z),transform.rot[0])
       self.calc_vertList += [(x,y,z)]
       f=self.parent.fov/z
       x,y = x*f,y*f
@@ -44,6 +44,7 @@ class EuclidianRenderer():
     self.screen = self.scene.screen
     self.w, self.h = self.screen.get_size()
     self.cx, self.cy = self.w //2,self.h //2
+  
   def onRender(self):
 
     self.screen.fill((100,10,255))
@@ -59,3 +60,11 @@ class EuclidianRenderer():
     faces_drawOrder = sorted(range(len(self.calc_facesList)),key = lambda i:self.calc_depth[i],reverse=True)
 
     for i in faces_drawOrder:pygame.draw.polygon(self.screen,self.calc_facesColor[i],self.calc_facesList[i])
+
+class EuclidianRenderer():
+
+  def __init__(self,tagToRender,camera):
+    self.scene = None
+    self.tagToRender = tagToRender
+    self.parent = camera
+    self.transform = EuclidianPosition([0,0,0],[0,0])

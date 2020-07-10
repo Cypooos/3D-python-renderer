@@ -15,6 +15,7 @@ class Scene():
     while name+str(val) in self._objs.values():val += 1
     self._objs[name+str(val)] = obj
     obj.scene = self
+    obj.id_ = name+str(val)
     return name+str(val)
 
   def getByTag(self,tag):
@@ -24,9 +25,9 @@ class Scene():
     return None
 
   def getAbsolutePos(self,obj):
-    if obj.parent == None: return obj.position
+    if obj.parent == None: return obj.transform
     Ppos = self.getAbsolutePos(obj.parent)
-    return Ppos+obj.position
+    return Ppos+obj.transform
 
   def call(self,methodName,*arg,**kwargs):
     for x in self._objs.values():
@@ -38,6 +39,7 @@ class Scene():
     self.clock = None
     self.screen = screen
     self.call("onAwake")
+    print("Objets :"+str("\n".join([x+str(': ')+str(y) for x,y in self._objs.items()])))
 
   async def loop(self):
     pygame.init()
