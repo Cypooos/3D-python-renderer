@@ -1,11 +1,11 @@
-from core.positions import EuclidianPosition
+from core.eclDef import eclVector3, Transform
 import math
 import pygame
 
 class FlyCamera():
 
   def __init__(self):
-    self.transform = EuclidianPosition([0,0,0],[0,0])
+    self.transform = Transform([0,0,0],[0,0,0])
     self.fov = 100
     self.parent = None
     self.movement_speed = 3
@@ -13,19 +13,19 @@ class FlyCamera():
 
   def onKey(self,key):
     s=self.scene.deltaTime*self.movement_speed
-    if key[pygame.K_q]: self.transform.pos[1] -=s
-    if key[pygame.K_e]: self.transform.pos[1] +=s
+    if key[pygame.K_q]: self.transform.position.y -=s
+    if key[pygame.K_e]: self.transform.position.y +=s
 
-    x,y = s*math.sin(self.transform.rot[1]),s*math.cos(self.transform.rot[1])
+    x,y = s*math.sin(self.transform.rotation.y),s*math.cos(self.transform.rotation.y)
 
-    if key[pygame.K_w]: self.transform.pos[0] +=x;self.transform.pos[2] +=y;
-    if key[pygame.K_s]: self.transform.pos[0] -=x;self.transform.pos[2] -=y;
-    if key[pygame.K_a]: self.transform.pos[0] -=y;self.transform.pos[2] +=x;
-    if key[pygame.K_d]: self.transform.pos[0] +=y;self.transform.pos[2] -=x;
+    if key[pygame.K_w]: self.transform.position.x +=x;self.transform.position.z +=y;
+    if key[pygame.K_s]: self.transform.position.x  -=x;self.transform.position.z -=y;
+    if key[pygame.K_a]: self.transform.position.x  -=y;self.transform.position.z +=x;
+    if key[pygame.K_d]: self.transform.position.x  +=y;self.transform.position.z -=x;
 
   def onMouseMove(self,move):
     x,y = move
     x/=self.sensitive; y/=self.sensitive
-    self.transform.rot[0]+=y;self.transform.rot[1]+=x
-    if self.transform.rot[0] > math.pi:self.transform.rot[0] = math.pi
-    if self.transform.rot[0] < -math.pi:self.transform.rot[0] = -math.pi
+    self.transform.rotation.x+=y;self.transform.rotation.y+=x
+    if self.transform.rotation.x > math.pi:self.transform.rotation.x = math.pi
+    if self.transform.rotation.x < -math.pi:self.transform.rotation.x = -math.pi

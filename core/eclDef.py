@@ -2,8 +2,21 @@ class eclVector3():
   def __init__(self,x,y,z):
     self.x,self.y,self.z = x,y,z
 
+class Transform():
+  def __init__(self,position,rotation):
+    if isinstance(position, eclVector3): self.position = position
+    else:self.position = eclVector3(position[0],position[1],position[2])
+    if isinstance(rotation, eclVector3): self.rotation = rotation
+    else:self.rotation = eclVector3(rotation[0],rotation[1],rotation[2])
+
+  def __add__(a,b):
+    return Transform(
+      eclVector3(a.position.x + b.position.x,a.position.y + b.position.y,a.position.z + b.position.z),
+      eclVector3(a.rotation.x + b.rotation.x,a.rotation.y + b.rotation.y,a.rotation.z + b.rotation.z))
+
+
 class elcTriangle():
-  def __init__(self,ptA,ptB,ptC):
+  def __init__(self,ptA=eclVector3(0,0,0),ptB=eclVector3(0,0,0),ptC=eclVector3(0,0,0)):
     self.points = [ptA,ptB,ptC]
   def calculateNormal(self):
     return NotImplemented
@@ -13,7 +26,7 @@ class elcMesh():
     self.tri = [elcTriangle(eclVector3(*x[0]),eclVector3(*x[1]),eclVector3(*x[2])) for x in triList]
     self.isDoubleSided = isDoubleSided
 
-def setMeshByPoints(points,triangles,**kwargs):
+def setMeshByPoints(points,triangles):
   end = []
   for x in triangles:
     for count in range(1,len(x)-1):
@@ -22,7 +35,7 @@ def setMeshByPoints(points,triangles,**kwargs):
         points[x[count]],
         points[x[count+1]]])
   print(end)
-  return elcMesh(end,**kwargs)
+  return end
 
 
 def XbyXmatrix(size,init_number=0):
@@ -37,9 +50,9 @@ def multiplyMatrixVector3(elcVector3,matrix,out=None):
   
   w = elcVector3.x * matrix[0][3] + elcVector3.y * matrix[1][3] + elcVector3.z * matrix[2][3] + matrix[3][3]
   if w != 0.0:o.x /= w; o.y /= w; o.z /= w;
-  if out != None: return o
+  return o
 
 if __name__ == "__main__":
-  s = setMeshByPoints(
+  setMeshByPoints(
     [(-1,-1,-1),(1,-1,-1),(1,1,-1),(-1,1,-1),(-1,-1,1),(1,-1,1),(1,1,1),(-1,1,1)],
     [(0,1,2,3),(4,5,6,7),(0,1,5,4),(2,3,7,6),(0,3,7,4),(1,2,6,5)])

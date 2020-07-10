@@ -1,12 +1,12 @@
-from core.elcRenderer import EuclidianRenderer, OldEuclidianRenderer
+from core.eclRenderer import EuclidianRenderer, OldEuclidianRenderer
 from core.scene import Scene
 
-from core.elcShapes import Cube
+from core.eclShapes import Cube
 
 import asyncio
 import pygame 
 
-from core.elcCameras import FlyCamera
+from core.eclCameras import FlyCamera
 
 screen = pygame.display.set_mode([800,800])
 
@@ -18,13 +18,11 @@ sc = Scene()
 
 cam = FlyCamera()
 sc.addObject(cam)
-renderer = OldEuclidianRenderer('EUCLID',cam)
+renderer = EuclidianRenderer('EUCLID',cam)
 sc.addObject(renderer)
 
-cu = Cube((5,0,0))
+cu = Cube((0,0,-2))
 sc.addObject(cu,["EUCLID"])
-cu2 = Cube((0,2,0))
-sc.addObject(cu2,["EUCLID"])
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(sc.load(screen))

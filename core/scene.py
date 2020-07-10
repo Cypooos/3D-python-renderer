@@ -39,7 +39,7 @@ class Scene():
     self.clock = None
     self.screen = screen
     self.call("onAwake")
-    print("Objets :"+str("\n".join([x+str(': ')+str(y) for x,y in self._objs.items()])))
+    print("Objets :\n"+str("\n".join([x+str(': ')+str(y) for x,y in self._objs.items()])))
 
   async def loop(self):
     pygame.init()
