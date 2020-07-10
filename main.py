@@ -1,12 +1,12 @@
-from core.renderer import EuclidianRenderer, OldEuclidianRenderer
+from core.elcRenderer import EuclidianRenderer, OldEuclidianRenderer
 from core.scene import Scene
 
-from core.euclidianShapes import Cube
+from core.elcShapes import Cube
 
 import asyncio
 import pygame 
 
-from core.euclidiansCameras import FlyCamera
+from core.elcCameras import FlyCamera
 
 screen = pygame.display.set_mode([800,800])
 
