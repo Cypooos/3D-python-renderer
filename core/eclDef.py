@@ -1,6 +1,14 @@
 class eclVector3():
   def __init__(self,x,y,z):
     self.x,self.y,self.z = x,y,z
+  def __setitem__(self, numb, data):
+    if numb == 0: self.x = data
+    elif numb == 1: self.y = data
+    elif numb == 2: self.z = data
+  def __getitem__(self, numb):
+    if numb == 0: return self.x
+    elif numb == 1: return self.y
+    elif numb == 2: return self.z
 
 class Transform():
   def __init__(self,position,rotation):
@@ -20,11 +28,19 @@ class elcTriangle():
     self.points = [ptA,ptB,ptC]
   def calculateNormal(self):
     return NotImplemented
+  def __setitem__(self, numb, data):
+    self.points[numb] = data
+  def __getitem__(self, numb):
+    return self.points[numb]
 
 class elcMesh():
   def __init__(self,triList,isDoubleSided=False):
     self.tri = [elcTriangle(eclVector3(*x[0]),eclVector3(*x[1]),eclVector3(*x[2])) for x in triList]
     self.isDoubleSided = isDoubleSided
+  def __setitem__(self, numb, data):
+    self.tri[numb] = data
+  def __getitem__(self, numb):
+    return self.tri[numb]
 
 def setMeshByPoints(points,triangles):
   end = []
