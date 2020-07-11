@@ -79,14 +79,14 @@ class EuclidianRenderer():
     near = self.conf.get("near",0.1)
     far = self.conf.get("far",1000)
     fov = self.conf.get("fov",90)
-    fovRad = 1 / math.tan(fov * 0.5 / 180.0 * math.pi)
+    fovRad = 1/math.tan((fov/2) / (180 * math.pi))
 
-    self.projectionMatrix[0][0] = self.h/self.w * fovRad
+    self.projectionMatrix[0][0] = (self.h/self.w) * fovRad
     self.projectionMatrix[1][1] = fovRad
     self.projectionMatrix[2][2] = far / (far - near)
     self.projectionMatrix[3][2] = (-far * near) / (far - near)
-    self.projectionMatrix[2][3] = 1.0
-    self.projectionMatrix[3][3] = 0.0
+    self.projectionMatrix[2][3] = 1
+    self.projectionMatrix[3][3] = 0
     self.theta = 0
 
 
