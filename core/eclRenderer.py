@@ -62,7 +62,7 @@ class OldEuclidianRenderer():
 
     for i in faces_drawOrder:pygame.draw.polygon(self.screen,self.calc_facesColor[i],self.calc_facesList[i])
 
-class EuclidianRenderer():
+class MatrixEuclidianRenderer():
 
   def __init__(self,tagToRender,camera,**kwargs):
     self.scene = None
@@ -161,4 +161,45 @@ class EuclidianRenderer():
 
         # Draw triangle
         pygame.draw.polygon(self.screen, (100,10,255), [(triProjected[0].x, triProjected[0].y),(triProjected[1].x, triProjected[1].y),(triProjected[2].x, triProjected[2].y),(triProjected[0].x, triProjected[0].y)], 3)
-    
+
+
+
+
+class EuclidianRenderer():
+
+  def __init__(self,tagToRender,camera,**kwargs):
+    self.scene = None
+    self.tagToRender = tagToRender
+    self.parent = camera
+    self.transform = Transform([0,0,0],[0,0,0])
+    self.conf = kwargs
+
+  def onAwake(self):
+    self.screen = self.scene.screen
+    self.w, self.h = self.screen.get_size()
+    self.cx, self.cy = self.w //2,self.h //2
+    near = self.conf.get("near",0.1)
+    far = self.conf.get("far",1000)
+    fov = self.conf.get("fov",90)
+  
+
+
+  def onRender(self):
+
+    self.screen.fill((0,0,0))
+
+    objs = self.scene.getByTag(self.tagToRender)
+    for x in objs:
+      for tri_ in x.mesh.tri:
+
+      #
+      # x,y,z --> X,Y and Z as depth for verts calculations
+      # -1 <= X,Y <= 1
+      # 0 < Z < 1
+      # BC = tan(fov/2)*far
+      # X = x/((z*BC)/far)
+      # Y = y/((z*BC)/far)
+      # Z = (z-near)/(far-near)
+
+      # have a isVisible if countained X,Y in drawned shapes
+

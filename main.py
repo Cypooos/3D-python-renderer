@@ -1,4 +1,4 @@
-from core.eclRenderer import EuclidianRenderer, OldEuclidianRenderer
+from core.eclRenderer import MatrixEuclidianRenderer, OldEuclidianRenderer
 from core.scene import Scene
 
 from core.eclShapes import Cube
@@ -18,7 +18,7 @@ sc = Scene()
 
 cam = FlyCamera()
 sc.addObject(cam)
-renderer = EuclidianRenderer('EUCLID',cam)
+renderer = MatrixEuclidianRenderer('EUCLID',cam)
 sc.addObject(renderer)
 
 sc.addObject(Cube((0,0,0)),["EUCLID"])
