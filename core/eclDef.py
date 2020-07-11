@@ -60,7 +60,7 @@ def XbyXmatrix(size,init_number=0):
 def multiplyMatrixVector3(elcVector3,matrix,out=None):
   if out == None:o = eclVector3(0,0,0)
   else: o = out
-  o.x = elcVector3.x * matrix[0][1] + elcVector3.y * matrix[1][1] + elcVector3.z * matrix[2][1] + matrix[3][1]
+  o.x = elcVector3.x * matrix[0][0] + elcVector3.y * matrix[1][0] + elcVector3.z * matrix[2][0] + matrix[3][0]
   o.y = elcVector3.x * matrix[0][1] + elcVector3.y * matrix[1][1] + elcVector3.z * matrix[2][1] + matrix[3][1]
   o.z = elcVector3.x * matrix[0][2] + elcVector3.y * matrix[1][2] + elcVector3.z * matrix[2][2] + matrix[3][2]
   

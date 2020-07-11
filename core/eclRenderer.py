@@ -122,14 +122,14 @@ class EuclidianRenderer():
         triRotatedZX = elcTriangle()
 
         # Rotate in Z-Axis
-        triRotatedZ.points[0] = multiplyMatrixVector3(tri.points[0], matRotZ, triRotatedZ.points[0])
-        triRotatedZ.points[1] = multiplyMatrixVector3(tri.points[1], matRotZ, triRotatedZ.points[1])
-        triRotatedZ.points[2] = multiplyMatrixVector3(tri.points[2], matRotZ, triRotatedZ.points[2])
+        multiplyMatrixVector3(tri.points[0], matRotZ, triRotatedZ.points[0])
+        multiplyMatrixVector3(tri.points[1], matRotZ, triRotatedZ.points[1])
+        multiplyMatrixVector3(tri.points[2], matRotZ, triRotatedZ.points[2])
 
         # Rotate in X-Axis
-        triRotatedZX.points[0] = multiplyMatrixVector3(triRotatedZ.points[0], matRotX, triRotatedZX.points[0])
-        triRotatedZX.points[1] = multiplyMatrixVector3(triRotatedZ.points[1], matRotX, triRotatedZX.points[1])
-        triRotatedZX.points[2] = multiplyMatrixVector3(triRotatedZ.points[2], matRotX, triRotatedZX.points[2])
+        multiplyMatrixVector3(triRotatedZ.points[0], matRotX, triRotatedZX.points[0])
+        multiplyMatrixVector3(triRotatedZ.points[1], matRotX, triRotatedZX.points[1])
+        multiplyMatrixVector3(triRotatedZ.points[2], matRotX, triRotatedZX.points[2])
 
         # Offset into the screen
         triTranslated = triRotatedZX
@@ -138,9 +138,9 @@ class EuclidianRenderer():
         triTranslated.points[2].z = triRotatedZX.points[2].z + 3
 
         # Project triangles from 3D --> 2D
-        triProjected.points[0] = multiplyMatrixVector3(triTranslated.points[0], self.projectionMatrix, triProjected.points[0])
-        triProjected.points[1] = multiplyMatrixVector3(triTranslated.points[1], self.projectionMatrix, triProjected.points[1])
-        triProjected.points[2] = multiplyMatrixVector3(triTranslated.points[2], self.projectionMatrix, triProjected.points[2])
+        multiplyMatrixVector3(triTranslated.points[0], self.projectionMatrix, triProjected.points[0])
+        multiplyMatrixVector3(triTranslated.points[1], self.projectionMatrix, triProjected.points[1])
+        multiplyMatrixVector3(triTranslated.points[2], self.projectionMatrix, triProjected.points[2])
 
         # Scale into view
         triProjected.points[0].x += 1; triProjected.points[0].y += 1
