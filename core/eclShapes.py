@@ -2,7 +2,7 @@ from core.eclDef import elcMesh, Transform, setMeshByPoints
 class Cube():
 
   def __init__(self,pos,parent = None):
-    self.transform = Transform([0,0,0],[0,0,0])
+    self.transform = Transform(pos,[0,0,0])
     self.parent = parent
     """self.mesh = elcMesh( [
       [ [0,0,0], [0,1,0], [1,1,0]],

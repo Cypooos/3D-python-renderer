@@ -9,6 +9,10 @@ class eclVector3():
     if numb == 0: return self.x
     elif numb == 1: return self.y
     elif numb == 2: return self.z
+  def __add__(self, vect3):
+    return eclVector3(self.x+vect3[0],self.y+vect3[1],self.z+vect3[2])
+  def __sub__(self, vect3):
+    return eclVector3(self.x-vect3[0],self.y-vect3[1],self.z-vect3[2])
 
 class Transform():
   def __init__(self,position,rotation):

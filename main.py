@@ -21,8 +21,10 @@ sc.addObject(cam)
 renderer = EuclidianRenderer('EUCLID',cam)
 sc.addObject(renderer)
 
-cu = Cube((0,0,-2))
+cu = Cube((0,0,0))
 sc.addObject(cu,["EUCLID"])
+cu2 = Cube((3,0,0))
+sc.addObject(cu2,["EUCLID"])
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(sc.load(screen))

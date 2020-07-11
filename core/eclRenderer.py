@@ -114,45 +114,51 @@ class EuclidianRenderer():
 
     objs = self.scene.getByTag(self.tagToRender)
     for x in objs:
-      for tri in x.mesh.tri:
+      for tri_ in x.mesh.tri:
         
         triProjected = elcTriangle()
         triTranslated = elcTriangle()
         triRotatedZ = elcTriangle()
         triRotatedZX = elcTriangle()
+        tri = elcTriangle()
+
+        tri[0] = tri_[0] + self.scene.getAbsolutePos(x).position
+        tri[1] = tri_[1] + self.scene.getAbsolutePos(x).position
+        tri[2] = tri_[2] + self.scene.getAbsolutePos(x).position
+        print(tri[0][0], tri_[0][0], self.scene.getAbsolutePos(x).position[0])
 
         # Rotate in Z-Axis
-        multiplyMatrixVector3(tri.points[0], matRotZ, triRotatedZ.points[0])
-        multiplyMatrixVector3(tri.points[1], matRotZ, triRotatedZ.points[1])
-        multiplyMatrixVector3(tri.points[2], matRotZ, triRotatedZ.points[2])
+        multiplyMatrixVector3(tri[0], matRotZ, triRotatedZ[0])
+        multiplyMatrixVector3(tri[1], matRotZ, triRotatedZ[1])
+        multiplyMatrixVector3(tri[2], matRotZ, triRotatedZ[2])
 
         # Rotate in X-Axis
-        multiplyMatrixVector3(triRotatedZ.points[0], matRotX, triRotatedZX.points[0])
-        multiplyMatrixVector3(triRotatedZ.points[1], matRotX, triRotatedZX.points[1])
-        multiplyMatrixVector3(triRotatedZ.points[2], matRotX, triRotatedZX.points[2])
+        multiplyMatrixVector3(triRotatedZ[0], matRotX, triRotatedZX[0])
+        multiplyMatrixVector3(triRotatedZ[1], matRotX, triRotatedZX[1])
+        multiplyMatrixVector3(triRotatedZ[2], matRotX, triRotatedZX[2])
 
         # Offset into the screen
         triTranslated = triRotatedZX
-        triTranslated.points[0].z = triRotatedZX.points[0].z + 3
-        triTranslated.points[1].z = triRotatedZX.points[1].z + 3
-        triTranslated.points[2].z = triRotatedZX.points[2].z + 3
+        triTranslated[0].z = triRotatedZX[0].z + 3
+        triTranslated[1].z = triRotatedZX[1].z + 3
+        triTranslated[2].z = triRotatedZX[2].z + 3
 
         # Project triangles from 3D --> 2D
-        multiplyMatrixVector3(triTranslated.points[0], self.projectionMatrix, triProjected.points[0])
-        multiplyMatrixVector3(triTranslated.points[1], self.projectionMatrix, triProjected.points[1])
-        multiplyMatrixVector3(triTranslated.points[2], self.projectionMatrix, triProjected.points[2])
+        multiplyMatrixVector3(triTranslated[0], self.projectionMatrix, triProjected[0])
+        multiplyMatrixVector3(triTranslated[1], self.projectionMatrix, triProjected[1])
+        multiplyMatrixVector3(triTranslated[2], self.projectionMatrix, triProjected[2])
 
         # Scale into view
-        triProjected.points[0].x += 1; triProjected.points[0].y += 1
-        triProjected.points[1].x += 1; triProjected.points[1].y += 1
-        triProjected.points[2].x += 1; triProjected.points[2].y += 1
-        triProjected.points[0].x *= 0.5 * self.w
-        triProjected.points[0].y *= 0.5 * self.h
-        triProjected.points[1].x *= 0.5 * self.w
-        triProjected.points[1].y *= 0.5 * self.h
-        triProjected.points[2].x *= 0.5 * self.w
-        triProjected.points[2].y *= 0.5 * self.h
+        triProjected[0].x += 1; triProjected[0].y += 1
+        triProjected[1].x += 1; triProjected[1].y += 1
+        triProjected[2].x += 1; triProjected[2].y += 1
+        triProjected[0].x *= 0.5 * self.w
+        triProjected[0].y *= 0.5 * self.h
+        triProjected[1].x *= 0.5 * self.w
+        triProjected[1].y *= 0.5 * self.h
+        triProjected[2].x *= 0.5 * self.w
+        triProjected[2].y *= 0.5 * self.h
 
         # Draw triangle
-        pygame.draw.polygon(self.screen, (100,10,255), [(triProjected.points[0].x, triProjected.points[0].y),(triProjected.points[1].x, triProjected.points[1].y),(triProjected.points[2].x, triProjected.points[2].y),(triProjected.points[0].x, triProjected.points[0].y)], 3)
+        pygame.draw.polygon(self.screen, (100,10,255), [(triProjected[0].x, triProjected[0].y),(triProjected[1].x, triProjected[1].y),(triProjected[2].x, triProjected[2].y),(triProjected[0].x, triProjected[0].y)], 3)
     
