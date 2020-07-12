@@ -4,6 +4,7 @@ import pygame
 
 from core.eclDef import eclVector3, Transform, elcTriangle
 from core.eclDef import XbyXmatrix, multiplyMatrixVector3
+from core.eclDef import crossProduct
 
 class OldEuclidianRenderer():
 
@@ -178,28 +179,68 @@ class EuclidianRenderer():
     self.screen = self.scene.screen
     self.w, self.h = self.screen.get_size()
     self.cx, self.cy = self.w //2,self.h //2
-    near = self.conf.get("near",0.1)
-    far = self.conf.get("far",1000)
-    fov = self.conf.get("fov",90)
-  
+    self.near = self.conf.get("near",0.1)
+    self.far = self.conf.get("far",1000)
+    self.fov = self.conf.get("fov",90)
+    self.far_length = math.tan(self.fov/2)*self.far
 
+  @staticmethod # nerd shit
+  def rotate2d(pos,rad): x,y = pos;  s,c = math.sin(rad),math.cos(rad); return x*c-y*s,y*c+x*s
+
+  def _projection(self,vect3:eclVector3):
+    try:
+      X = vect3.x/((vect3.z*self.far_length)/self.far)
+      Y = vect3.y/((vect3.z*self.far_length)/self.far)
+      Z = (vect3.z-self.near)/(self.far-self.near)
+      return eclVector3(X,Y,Z) # -1_1 -1_1 0_1
+    except ZeroDivisionError:
+      return eclVector3(0,0,0)
+
+  def draw(self,triangle:elcTriangle):
+    try:
+      pygame.draw.polygon(self.screen, (100,10,255),
+        [ (triangle[0].x, triangle[0].y),
+          (triangle[1].x, triangle[1].y),
+          (triangle[2].x, triangle[2].y),
+          (triangle[0].x, triangle[0].y)
+        ], 3)
+    except TypeError:
+      pass
 
   def onRender(self):
 
     self.screen.fill((0,0,0))
+    absPosSelf = self.scene.getAbsoluteTransform(self).position
+    absRotSelf = self.scene.getAbsoluteTransform(self).rotation
 
     objs = self.scene.getByTag(self.tagToRender)
-    for x in objs:
-      for tri_ in x.mesh.tri:
+    for obj in objs:
+      absPosObj = self.scene.getAbsoluteTransform(obj).position
+      absRotObj = self.scene.getAbsoluteTransform(obj).rotation
+      for tri_ in obj.mesh.tri:
+        
+        triProj = elcTriangle()
+        for x in range(3):
+          posTemp = tri_[x]+absPosObj+absPosSelf
+          # rotate
+          posTemp.x, posTemp.z = self.rotate2d((posTemp.x,posTemp.z),absRotObj.x+absRotSelf.x)
+          posTemp.y, posTemp.x = self.rotate2d((posTemp.y,posTemp.x),absRotObj.y+absRotSelf.y)
+          posTemp.z, posTemp.y = self.rotate2d((posTemp.z,posTemp.y),absRotObj.z+absRotSelf.z)
+          #posTemp.z, posTemp.x = self.rotate2d((posTemp.z,posTemp.x),absRotObj.y+absRotSelf.y)
+          triProj[x] = self._projection(posTemp)
 
-      #
-      # x,y,z --> X,Y and Z as depth for verts calculations
-      # -1 <= X,Y <= 1
-      # 0 < Z < 1
-      # BC = tan(fov/2)*far
-      # X = x/((z*BC)/far)
-      # Y = y/((z*BC)/far)
-      # Z = (z-near)/(far-near)
+        shouldDraw = False
+        normal = triProj.calculateNormal()
+        if (normal.x * (triProj[0].x - absPosObj.x + absPosSelf.x) + 
+          normal.y * (triProj[0].y - absPosObj.y + absPosSelf.y) +
+          normal.z * (triProj[0].z - absPosObj.z + absPosSelf.z) < 0):shouldDraw = True
+        
+        def rescale(x,min_,max_):return (x/2+0.5)*(max_+min_)
 
-      # have a isVisible if countained X,Y in drawned shapes
-
+        if shouldDraw:
+          print("Draw, pos ="+str(triProj[0].x)+", "+str(triProj[0].x))
+          self.draw(elcTriangle(
+            eclVector3(rescale(triProj[0].x,0,self.w),rescale(triProj[0].y,0,self.h),0),
+            eclVector3(rescale(triProj[1].x,0,self.w),rescale(triProj[1].y,0,self.h),0),
+            eclVector3(rescale(triProj[2].x,0,self.w),rescale(triProj[2].y,0,self.h),0)
+          ))

@@ -24,9 +24,9 @@ class Scene():
     if id_ in self._objs.keys():return self._objs[id_]
     return None
 
-  def getAbsolutePos(self,obj):
+  def getAbsoluteTransform(self,obj):
     if obj.parent == None: return obj.transform
-    Ppos = self.getAbsolutePos(obj.parent)
+    Ppos = self.getAbsoluteTransform(obj.parent)
     return Ppos+obj.transform
 
   def call(self,methodName,*arg,**kwargs):

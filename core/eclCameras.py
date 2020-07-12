@@ -2,7 +2,7 @@ from core.eclDef import eclVector3, Transform
 import math
 import pygame
 
-class FlyCamera():
+class FlyAbsoluteCamera():
 
   def __init__(self):
     self.transform = Transform([0,0,0],[0,0,0])
@@ -15,17 +15,22 @@ class FlyCamera():
     s=self.scene.deltaTime*self.movement_speed
     if key[pygame.K_q]: self.transform.position.y -=s
     if key[pygame.K_e]: self.transform.position.y +=s
+    if key[pygame.K_w]: self.transform.position.x +=s
+    if key[pygame.K_s]: self.transform.position.x -=s
+    if key[pygame.K_a]: self.transform.position.z +=s
+    if key[pygame.K_d]: self.transform.position.z -=s
+    """
+    x,z = s*math.sin(self.transform.rotation.x),s*math.cos(self.transform.rotation.z)
 
-    x,y = s*math.sin(self.transform.rotation.y),s*math.cos(self.transform.rotation.y)
+    if key[pygame.K_w]: self.transform.position.x +=x;self.transform.position.z +=z
+    if key[pygame.K_s]: self.transform.position.x -=x;self.transform.position.z -=z
+    if key[pygame.K_a]: self.transform.position.x -=z;self.transform.position.z +=x
+    if key[pygame.K_d]: self.transform.position.x +=z;self.transform.position.z -=x"""
 
-    if key[pygame.K_w]: self.transform.position.x +=x;self.transform.position.z +=y;
-    if key[pygame.K_s]: self.transform.position.x  -=x;self.transform.position.z -=y;
-    if key[pygame.K_a]: self.transform.position.x  -=y;self.transform.position.z +=x;
-    if key[pygame.K_d]: self.transform.position.x  +=y;self.transform.position.z -=x;
 
   def onMouseMove(self,move):
-    x,y = move
-    x/=self.sensitive; y/=self.sensitive
-    self.transform.rotation.x+=y;self.transform.rotation.y+=x
-    if self.transform.rotation.x > math.pi:self.transform.rotation.x = math.pi
-    if self.transform.rotation.x < -math.pi:self.transform.rotation.x = -math.pi
+    x,z = move
+    x/=self.sensitive; z/=self.sensitive
+    self.transform.rotation.z-=z;self.transform.rotation.x+=x
+    if self.transform.rotation.z > math.pi/2:self.transform.rotation.z = math.pi/2
+    if self.transform.rotation.z < -math.pi/2:self.transform.rotation.z = -math.pi/2

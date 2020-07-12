@@ -1,5 +1,7 @@
+import math
+
 class eclVector3():
-  def __init__(self,x,y,z):
+  def __init__(self,x=0,y=0,z=0):
     self.x,self.y,self.z = x,y,z
   def __setitem__(self, numb, data):
     if numb == 0: self.x = data
@@ -9,10 +11,10 @@ class eclVector3():
     if numb == 0: return self.x
     elif numb == 1: return self.y
     elif numb == 2: return self.z
-  def __add__(self, vect3):
-    return eclVector3(self.x+vect3[0],self.y+vect3[1],self.z+vect3[2])
-  def __sub__(self, vect3):
-    return eclVector3(self.x-vect3[0],self.y-vect3[1],self.z-vect3[2])
+  def __add__(self, vect3):return eclVector3(self.x+vect3[0],self.y+vect3[1],self.z+vect3[2])
+  def __sub__(self, vect3):return eclVector3(self.x-vect3[0],self.y-vect3[1],self.z-vect3[2])
+  def __len__(self):return 3
+
 
 class Transform():
   def __init__(self,position,rotation):
@@ -31,11 +33,23 @@ class elcTriangle():
   def __init__(self,ptA=eclVector3(0,0,0),ptB=eclVector3(0,0,0),ptC=eclVector3(0,0,0)):
     self.points = [ptA,ptB,ptC]
   def calculateNormal(self):
-    return NotImplemented
+    line1 = eclVector3();line2 = eclVector3()
+    
+    line1.x = self.points[1].x - self.points[0].x
+    line1.y = self.points[1].y - self.points[0].y
+    line1.z = self.points[1].z - self.points[0].z
+    
+    line2.x = self.points[2].x - self.points[0].x
+    line2.y = self.points[2].y - self.points[0].y
+    line2.z = self.points[2].z - self.points[0].z
+    
+    return crossProduct(line1,line2)
+
   def __setitem__(self, numb, data):
     self.points[numb] = data
   def __getitem__(self, numb):
     return self.points[numb]
+  def __len__(self):return 3
 
 class elcMesh():
   def __init__(self,triList,isDoubleSided=False):
@@ -45,6 +59,19 @@ class elcMesh():
     self.tri[numb] = data
   def __getitem__(self, numb):
     return self.tri[numb]
+  def __len__(self):return len(self.tri)
+
+def crossProduct(first:eclVector3,second:eclVector3):
+  returning = eclVector3(1,1,1)
+  try:
+    returning.x = first.y*second.z - first.z*second.y
+    returning.y = first.z*second.x - first.x*second.z
+    returning.z = first.x*second.y - first.y*second.x
+    l = math.sqrt(returning.x**2+returning.y**2+returning.z**2)
+    returning.x /= l;returning.y /= l;returning.z /= l
+  except ZeroDivisionError:
+    print("Err")
+  return returning
 
 def setMeshByPoints(points,triangles):
   end = []
