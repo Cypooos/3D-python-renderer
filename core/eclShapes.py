@@ -1,5 +1,14 @@
 from core.eclDef import elcMesh, Transform, setMeshByPoints
-class Cube():
+
+class elcEmpty():
+
+  def __init__(self,transform,parent = None):
+    if isinstance(transform,Transform):self.transform = transform
+    else: self.transform = Transform(transform,[0,0,0])
+    self.parent = parent
+
+
+class elcCube():
 
   def __init__(self,transform,parent = None):
     if isinstance(transform,Transform):self.transform = transform

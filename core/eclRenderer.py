@@ -4,7 +4,7 @@ import pygame
 
 from core.eclDef import eclVector3, Transform, elcTriangle
 from core.eclDef import XbyXmatrix, multiplyMatrixVector3
-from core.eclDef import crossProduct
+from core.eclDef import crossProduct, dotProduct, normalise
 
 class OldEuclidianRenderer():
 
@@ -183,6 +183,9 @@ class EuclidianRenderer():
     self.far = self.conf.get("far",1000)
     self.fov = self.conf.get("fov",90)
     self.far_length = math.tan(self.fov/2)*self.far
+    self.lights = self.scene.getByTag(self.conf.get("lightTag",""))
+    if len(self.lights) == 0:self.light = Transform([0,0,0],[0,45,0]);self.lights = [self.light]
+    else:self.light = self.lights[0].position
 
   @staticmethod # nerd shit
   def rotate2d(pos,rad): x,y = pos;  s,c = math.sin(rad),math.cos(rad); return x*c-y*s,y*c+x*s
@@ -196,14 +199,22 @@ class EuclidianRenderer():
     except ZeroDivisionError:
       return eclVector3(0,0,0)
 
-  def draw(self,triangle:elcTriangle):
+  def draw(self,triangle:elcTriangle,color=None):
     try:
-      pygame.draw.polygon(self.screen, (100,10,255),
-        [ (triangle[0].x, triangle[0].y),
-          (triangle[1].x, triangle[1].y),
-          (triangle[2].x, triangle[2].y),
-          (triangle[0].x, triangle[0].y)
-        ], 3)
+      if color == None:
+        pygame.draw.polygon(self.screen, (100,10,255),
+          [ (triangle[0].x, triangle[0].y),
+            (triangle[1].x, triangle[1].y),
+            (triangle[2].x, triangle[2].y),
+            (triangle[0].x, triangle[0].y)
+          ], 3)
+      else:
+        pygame.draw.polygon(self.screen, color,
+          [ (triangle[0].x, triangle[0].y),
+            (triangle[1].x, triangle[1].y),
+            (triangle[2].x, triangle[2].y),
+            (triangle[0].x, triangle[0].y)
+          ])
     except TypeError:
       pass
 
@@ -214,14 +225,20 @@ class EuclidianRenderer():
     absRotSelf = self.scene.getAbsoluteTransform(self).rotation
 
     objs = self.scene.getByTag(self.tagToRender)
+
+    tris_sorted = []
+
     for obj in objs:
       absPosObj = self.scene.getAbsoluteTransform(obj).position
       absRotObj = self.scene.getAbsoluteTransform(obj).rotation
       for tri_ in obj.mesh.tri:
         
         triProj = elcTriangle()
+        triTrans = elcTriangle()
         for x in range(3):
-          posTemp = tri_[x]+absPosObj+absPosSelf
+          triTrans[x] = tri_[x]+absPosObj+absPosSelf
+        for x in range(3):
+          posTemp = triTrans[x]
           # rotate
           posTemp.x, posTemp.z = self.rotate2d((posTemp.x,posTemp.z),absRotObj.x+absRotSelf.x)
           posTemp.y, posTemp.x = self.rotate2d((posTemp.y,posTemp.x),absRotObj.y+absRotSelf.y)
@@ -229,18 +246,27 @@ class EuclidianRenderer():
           #posTemp.z, posTemp.x = self.rotate2d((posTemp.z,posTemp.x),absRotObj.y+absRotSelf.y)
           triProj[x] = self._projection(posTemp)
 
-        shouldDraw = False
-        normal = triProj.calculateNormal()
-        if (normal.x * (triProj[0].x - absPosObj.x + absPosSelf.x) + 
-          normal.y * (triProj[0].y - absPosObj.y + absPosSelf.y) +
-          normal.z * (triProj[0].z - absPosObj.z + absPosSelf.z) < 0):shouldDraw = True
+        shouldDraw = True
+        normal = triTrans.calculateNormal()
+        if (dotProduct(normal,triTrans[0]-absPosSelf) <= 0):shouldDraw = True
         
         def rescale(x,min_,max_):return (x/2+0.5)*(max_+min_)
 
         if shouldDraw:
-          print("Draw, pos ="+str(triProj[0].x)+", "+str(triProj[0].x))
-          self.draw(elcTriangle(
-            eclVector3(rescale(triProj[0].x,0,self.w),rescale(triProj[0].y,0,self.h),0),
-            eclVector3(rescale(triProj[1].x,0,self.w),rescale(triProj[1].y,0,self.h),0),
-            eclVector3(rescale(triProj[2].x,0,self.w),rescale(triProj[2].y,0,self.h),0)
-          ))
+          color = dotProduct(normal,self.light.position)*255
+          white = int(color)
+          tris_sorted.append([triProj,[white,white,white]])
+    
+    tris_sorted.sort(key=lambda x:(x[0][0].z+x[0][1].z+x[0][2].z)/3)
+    for tri,color in tris_sorted:
+      print("Draw, pos ="+str(tri[0].x)+", "+str(tri[0].x))
+      self.draw(elcTriangle(
+        eclVector3(rescale(tri[0].x,0,self.w),rescale(tri[0].y,0,self.h),0),
+        eclVector3(rescale(tri[1].x,0,self.w),rescale(tri[1].y,0,self.h),0),
+        eclVector3(rescale(tri[2].x,0,self.w),rescale(tri[2].y,0,self.h),0)
+      ),color)
+      self.draw(elcTriangle(
+        eclVector3(rescale(tri[0].x,0,self.w),rescale(tri[0].y,0,self.h),0),
+        eclVector3(rescale(tri[1].x,0,self.w),rescale(tri[1].y,0,self.h),0),
+        eclVector3(rescale(tri[2].x,0,self.w),rescale(tri[2].y,0,self.h),0)
+      ))

@@ -61,16 +61,21 @@ class elcMesh():
     return self.tri[numb]
   def __len__(self):return len(self.tri)
 
+def dotProduct(normal:eclVector3,other:eclVector3):
+  return normal.x * other.x + normal.y * other.y +normal.z * other.z
+
+def normalise(vect:eclVector3):
+  if vect.x == 0 and vect.y == 0 and vect.z == 0: return eclVector3(0,0,0)
+  l = math.sqrt(vect.x**2+vect.y**2+vect.z**2)
+  vect.x /= l;vect.y /= l;vect.z /= l
+  return vect
+
 def crossProduct(first:eclVector3,second:eclVector3):
   returning = eclVector3(1,1,1)
-  try:
-    returning.x = first.y*second.z - first.z*second.y
-    returning.y = first.z*second.x - first.x*second.z
-    returning.z = first.x*second.y - first.y*second.x
-    l = math.sqrt(returning.x**2+returning.y**2+returning.z**2)
-    returning.x /= l;returning.y /= l;returning.z /= l
-  except ZeroDivisionError:
-    print("Err")
+  returning.x = first.y*second.z - first.z*second.y
+  returning.y = first.z*second.x - first.x*second.z
+  returning.z = first.x*second.y - first.y*second.x
+  returning = normalise(returning)
   return returning
 
 def setMeshByPoints(points,triangles):
