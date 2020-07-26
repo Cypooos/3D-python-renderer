@@ -258,7 +258,7 @@ class EuclidianRenderer():
           color = rescale(dotProduct(normal_posed,self.light.transform.position),0,255)
           print(color)
           white = int(color)
-          tris_sorted.append([triProj,[white,white,white],sum(abs(sum(triPosed[j][i] for j in range(3))) for i in range(3))])
+          tris_sorted.append([triProj,[white,white,white],sum(sum(abs(triPosed[j][i]) for j in range(3)) for i in range(3))])
     
     tris_sorted = sorted(tris_sorted,key=lambda x:x[2],reverse=True)
     for tri,color,_ in tris_sorted:
@@ -267,8 +267,8 @@ class EuclidianRenderer():
         eclVector3(rescale(tri[1].x,0,self.w),rescale(tri[1].y,0,self.h),0),
         eclVector3(rescale(tri[2].x,0,self.w),rescale(tri[2].y,0,self.h),0)
       ),color)
-      self.draw(elcTriangle(
+      """self.draw(elcTriangle(
         eclVector3(rescale(tri[0].x,0,self.w),rescale(tri[0].y,0,self.h),0),
         eclVector3(rescale(tri[1].x,0,self.w),rescale(tri[1].y,0,self.h),0),
         eclVector3(rescale(tri[2].x,0,self.w),rescale(tri[2].y,0,self.h),0)
-      ))
+      ))"""

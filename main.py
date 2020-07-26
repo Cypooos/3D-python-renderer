@@ -20,7 +20,7 @@ sc = Scene()
 cam = FlyAbsoluteCamera(); sc.addObject(cam)
 sc.addObject(EuclidianRenderer('EUCLID',cam,lightTag="Light"))
 
-sc.addObject(elcEmpty(Transform([0,0,-1],[0,0,0])),['Light'])
+sc.addObject(elcEmpty(Transform([0,-0.5,-0.8],[0,0,0])),['Light'])
 
 sc.addObject(elcCube((0,0,0)),["EUCLID"])
 sc.addObject(elcCube((0,0,1)),["EUCLID"])
