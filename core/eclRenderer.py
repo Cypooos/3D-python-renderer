@@ -11,8 +11,7 @@ class OldEuclidianRenderer():
   def __init__(self,tagToRender,camera):
     self.scene = None
     self.tagToRender = tagToRender
-    self.parent = camera
-    self.transform = Transform([0,0,0],[0,0,0])
+    self.transform = camera.transform
 
   @staticmethod # nerd shit
   def rotate2d(pos,rad): x,y = pos;  s,c = math.sin(rad),math.cos(rad); return x*c-y*s,y*c+x*s
@@ -68,8 +67,7 @@ class MatrixEuclidianRenderer():
   def __init__(self,tagToRender,camera,**kwargs):
     self.scene = None
     self.tagToRender = tagToRender
-    self.parent = camera
-    self.transform = Transform([0,0,0],[0,0,0])
+    self.transform = camera.transform
     self.projectionMatrix = XbyXmatrix(4,0)
     self.conf = kwargs
 
@@ -171,8 +169,7 @@ class EuclidianRenderer():
   def __init__(self,tagToRender,camera,**kwargs):
     self.scene = None
     self.tagToRender = tagToRender
-    self.parent = camera
-    self.transform = Transform([0,0,0],[0,0,0])
+    self.transform = camera.transform
     self.conf = kwargs
 
   def onAwake(self):
@@ -185,10 +182,10 @@ class EuclidianRenderer():
     self.far_length = math.tan(self.fov/2)*self.far
     self.lights = self.scene.getByTag(self.conf.get("lightTag",""))
     if len(self.lights) == 0:self.light = Transform([0,0,0],[0,45,0]);self.lights = [self.light]
-    else:self.light = self.lights[0].position
+    else:self.light = self.lights[0]
 
-  @staticmethod # nerd shit
-  def rotate2d(pos,rad): x,y = pos;  s,c = math.sin(rad),math.cos(rad); return x*c-y*s,y*c+x*s
+  @staticmethod
+  def rotate2d(pos,rad): x,y = pos;  s,c = math.sin(rad),math.cos(rad); return x*c-y*s,y*c+x*s # wtf 
 
   def _projection(self,vect3:eclVector3):
     try:
@@ -207,7 +204,7 @@ class EuclidianRenderer():
             (triangle[1].x, triangle[1].y),
             (triangle[2].x, triangle[2].y),
             (triangle[0].x, triangle[0].y)
-          ], 3)
+          ], 2)
       else:
         pygame.draw.polygon(self.screen, color,
           [ (triangle[0].x, triangle[0].y),
@@ -221,45 +218,47 @@ class EuclidianRenderer():
   def onRender(self):
 
     self.screen.fill((0,0,0))
-    absPosSelf = self.scene.getAbsoluteTransform(self).position
-    absRotSelf = self.scene.getAbsoluteTransform(self).rotation
+    absPosSelf = self.transform.position
+    absRotSelf = self.transform.rotation
 
     objs = self.scene.getByTag(self.tagToRender)
 
     tris_sorted = []
 
     for obj in objs:
-      absPosObj = self.scene.getAbsoluteTransform(obj).position
-      absRotObj = self.scene.getAbsoluteTransform(obj).rotation
+      absPosObj = obj.transform.position
+      absRotObj = obj.transform.rotation
       for tri_ in obj.mesh.tri:
         
         triProj = elcTriangle()
-        triTrans = elcTriangle()
+        triPosed = elcTriangle()
         for x in range(3):
-          triTrans[x] = tri_[x]+absPosObj+absPosSelf
-        for x in range(3):
-          posTemp = triTrans[x]
-          # rotate
+          posTemp = tri_[x]+absPosObj+absPosSelf
           posTemp.x, posTemp.z = self.rotate2d((posTemp.x,posTemp.z),absRotObj.x+absRotSelf.x)
           posTemp.y, posTemp.x = self.rotate2d((posTemp.y,posTemp.x),absRotObj.y+absRotSelf.y)
           posTemp.z, posTemp.y = self.rotate2d((posTemp.z,posTemp.y),absRotObj.z+absRotSelf.z)
+          triPosed[x] = posTemp
+        
+        for x in range(3):
           #posTemp.z, posTemp.x = self.rotate2d((posTemp.z,posTemp.x),absRotObj.y+absRotSelf.y)
-          triProj[x] = self._projection(posTemp)
+          triProj[x] = self._projection(triPosed[x])
 
+        shouldDraw = False
+        normal_proj = triProj.calculateNormal()
+        normal_posed = triPosed.calculateNormal()
+        if (dotProduct(normal_proj,triProj[0] - self.transform.position) > 0):shouldDraw = True
         shouldDraw = True
-        normal = triTrans.calculateNormal()
-        if (dotProduct(normal,triTrans[0]-absPosSelf) <= 0):shouldDraw = True
         
         def rescale(x,min_,max_):return (x/2+0.5)*(max_+min_)
 
         if shouldDraw:
-          color = dotProduct(normal,self.light.position)*255
+          color = rescale(dotProduct(normal_posed,self.light.transform.position),0,255)
+          print(color)
           white = int(color)
-          tris_sorted.append([triProj,[white,white,white]])
-    
-    tris_sorted.sort(key=lambda x:(x[0][0].z+x[0][1].z+x[0][2].z)/3)
-    for tri,color in tris_sorted:
-      print("Draw, pos ="+str(tri[0].x)+", "+str(tri[0].x))
+          tris_sorted.append([triProj,[white,white,white],sum(sum(triPosed[j][i] for j in range(3))**2 for i in range(3))])
+    print("ok")
+    tris_sorted = sorted(tris_sorted,key=lambda x:x[2],reverse=True)
+    for tri,color,_ in tris_sorted:
       self.draw(elcTriangle(
         eclVector3(rescale(tri[0].x,0,self.w),rescale(tri[0].y,0,self.h),0),
         eclVector3(rescale(tri[1].x,0,self.w),rescale(tri[1].y,0,self.h),0),

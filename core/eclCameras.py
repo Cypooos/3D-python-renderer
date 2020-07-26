@@ -7,7 +7,6 @@ class FlyAbsoluteCamera():
   def __init__(self):
     self.transform = Transform([0,0,0],[0,0,0])
     self.fov = 100
-    self.parent = None
     self.movement_speed = 3
     self.sensitive = 30
 

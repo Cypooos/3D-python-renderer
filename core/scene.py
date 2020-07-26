@@ -24,24 +24,25 @@ class Scene():
     if id_ in self._objs.keys():return self._objs[id_]
     return None
 
-  def getAbsoluteTransform(self,obj):
+  # I don't use parent system anymore. It doesn't fit a "tag" phylosophy
+  """def getAbsoluteTransform(self,obj): 
     if obj.parent == None: return obj.transform
     Ppos = self.getAbsoluteTransform(obj.parent)
-    return Ppos+obj.transform
+    return Ppos+obj.transform"""
 
   def call(self,methodName,*arg,**kwargs):
     for x in self._objs.values():
       meth = getattr(x, methodName, None)
       if callable(meth):meth(*arg,**kwargs)
   
-  async def load(self,screen):
+  def load(self,screen):
     self.deltaTime = 0.0
     self.clock = None
     self.screen = screen
     self.call("onAwake")
     print("Objets :\n"+str("\n".join([x+str(': ')+str(y) for x,y in self._objs.items()])))
 
-  async def loop(self):
+  def loop(self):
     pygame.init()
     clock = pygame.time.Clock()
     self.working = True

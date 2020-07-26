@@ -4,7 +4,6 @@ from core.scene import Scene
 from core.eclShapes import elcCube, elcEmpty
 from core.eclDef import Transform
 
-import asyncio
 import pygame 
 
 from core.eclCameras import FlyAbsoluteCamera
@@ -21,14 +20,12 @@ sc = Scene()
 cam = FlyAbsoluteCamera(); sc.addObject(cam)
 sc.addObject(EuclidianRenderer('EUCLID',cam,lightTag="Light"))
 
-sc.addObject(elcEmpty(Transform([0,0,-1],[0,0,0]),['Light']))
+sc.addObject(elcEmpty(Transform([0,0,-1],[0,0,0])),['Light'])
 
 sc.addObject(elcCube((0,0,0)),["EUCLID"])
 sc.addObject(elcCube((0,0,1)),["EUCLID"])
 sc.addObject(elcCube((0,0,-1)),["EUCLID"])
 sc.addObject(elcCube(Transform([0,2,0],[0,0,0])),["EUCLID"])
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(sc.load(screen))
-loop.run_until_complete(sc.loop())
-loop.close()
+sc.load(screen)
+sc.loop()

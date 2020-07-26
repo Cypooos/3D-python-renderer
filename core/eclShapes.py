@@ -2,18 +2,16 @@ from core.eclDef import elcMesh, Transform, setMeshByPoints
 
 class elcEmpty():
 
-  def __init__(self,transform,parent = None):
+  def __init__(self,transform):
     if isinstance(transform,Transform):self.transform = transform
     else: self.transform = Transform(transform,[0,0,0])
-    self.parent = parent
 
 
 class elcCube():
 
-  def __init__(self,transform,parent = None):
+  def __init__(self,transform):
     if isinstance(transform,Transform):self.transform = transform
     else: self.transform = Transform(transform,[0,0,0])
-    self.parent = parent
     self.mesh = elcMesh( [
       [ [0,0,0], [0,1,0], [1,1,0]],
       [ [0,0,0], [1,1,0], [1,0,0]],

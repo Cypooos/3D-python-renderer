@@ -65,7 +65,7 @@ def dotProduct(normal:eclVector3,other:eclVector3):
   return normal.x * other.x + normal.y * other.y +normal.z * other.z
 
 def normalise(vect:eclVector3):
-  if vect.x == 0 and vect.y == 0 and vect.z == 0: return eclVector3(0,0,0)
+  if vect.x == 0 and vect.y == 0 and vect.z == 0: return vect
   l = math.sqrt(vect.x**2+vect.y**2+vect.z**2)
   vect.x /= l;vect.y /= l;vect.z /= l
   return vect
