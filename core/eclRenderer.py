@@ -231,21 +231,24 @@ class EuclidianRenderer():
       for tri_ in obj.mesh.tri:
         
         triProj = elcTriangle()
+        triRoted = elcTriangle()
         triPosed = elcTriangle()
         for x in range(3):
-          posTemp = tri_[x]+absPosObj+absPosSelf
+          triPosed[x] = tri_[x]+absPosObj+absPosSelf
+          posTemp = eclVector3(triPosed[x].x,triPosed[x].y,triPosed[x].z) # copy
           posTemp.x, posTemp.z = self.rotate2d((posTemp.x,posTemp.z),absRotObj.x+absRotSelf.x)
           posTemp.y, posTemp.x = self.rotate2d((posTemp.y,posTemp.x),absRotObj.y+absRotSelf.y)
           posTemp.z, posTemp.y = self.rotate2d((posTemp.z,posTemp.y),absRotObj.z+absRotSelf.z)
-          triPosed[x] = posTemp
+          triRoted[x] = posTemp
         
         for x in range(3):
           #posTemp.z, posTemp.x = self.rotate2d((posTemp.z,posTemp.x),absRotObj.y+absRotSelf.y)
-          triProj[x] = self._projection(triPosed[x])
+          triProj[x] = self._projection(triRoted[x])
 
         shouldDraw = False
         normal_proj = triProj.calculateNormal()
         normal_posed = triPosed.calculateNormal()
+        normal_roted = triRoted.calculateNormal()
         if (dotProduct(normal_proj,triProj[0] - self.transform.position) > 0):shouldDraw = True
         shouldDraw = True
         
@@ -255,8 +258,8 @@ class EuclidianRenderer():
           color = rescale(dotProduct(normal_posed,self.light.transform.position),0,255)
           print(color)
           white = int(color)
-          tris_sorted.append([triProj,[white,white,white],sum(sum(triPosed[j][i] for j in range(3))**2 for i in range(3))])
-    print("ok")
+          tris_sorted.append([triProj,[white,white,white],sum(abs(sum(triPosed[j][i] for j in range(3))) for i in range(3))])
+    
     tris_sorted = sorted(tris_sorted,key=lambda x:x[2],reverse=True)
     for tri,color,_ in tris_sorted:
       self.draw(elcTriangle(
