@@ -31,5 +31,5 @@ class FlyAbsoluteCamera():
     x,z = move
     x/=self.sensitive; z/=self.sensitive
     self.transform.rotation.z-=z;self.transform.rotation.x+=x
-    if self.transform.rotation.z > math.pi/2:self.transform.rotation.z = math.pi/2
-    if self.transform.rotation.z < -math.pi/2:self.transform.rotation.z = -math.pi/2
+    if self.transform.rotation.z > math.pi/4:self.transform.rotation.z = math.pi/4
+    if self.transform.rotation.z < -math.pi/4:self.transform.rotation.z = -math.pi/4

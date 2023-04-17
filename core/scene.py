@@ -7,7 +7,7 @@ class Scene():
   def __init__(self):
     self._objs = {}
     self.working = False
-  
+
   def addObject(self,obj,tags=None):
     if tags != None: obj.tags = tags
     name = "obj-"+str(obj.__class__.__name__)+"-"+str(random.randint(1000,9999))
@@ -37,6 +37,7 @@ class Scene():
   
   def load(self,screen):
     self.deltaTime = 0.0
+    self.total_time = 0.0
     self.clock = None
     self.screen = screen
     self.call("onAwake")
@@ -49,6 +50,7 @@ class Scene():
     self.call("onStart")
     while self.working:
       self.deltaTime = clock.tick()/1000
+      self.total_time += self.deltaTime
       key = pygame.key.get_pressed()
       for event in pygame.event.get():
         if event.type==pygame.QUIT:
@@ -60,7 +62,7 @@ class Scene():
       self.call("onKey",key)
       
       
-      self.call("onRender")
+      self.call("onRender",self.total_time)
       self.call("onPostProcessing")
       pygame.display.flip()
 

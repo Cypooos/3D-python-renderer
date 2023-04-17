@@ -215,7 +215,7 @@ class EuclidianRenderer():
     except TypeError:
       pass
 
-  def onRender(self):
+  def onRender(self,*arg,**kwargs):
 
     self.screen.fill((0,0,0))
     absPosSelf = self.transform.position
